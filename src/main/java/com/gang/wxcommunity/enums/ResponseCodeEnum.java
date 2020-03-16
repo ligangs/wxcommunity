@@ -8,6 +8,7 @@ public enum ResponseCodeEnum{
 
     SUCCESS("0000", "成功"),
     NOT_LOGIN("0001", "用户未登录"),
+    NO_COMMENT("0002", "没有评论内容"),
 
     ERROR_400("9999", "error.400"),
     ERROR_401("9999", "error.401"),
