@@ -1,6 +1,7 @@
 package com.gang.wxcommunity.service;
 
 import com.gang.wxcommunity.dto.QuestionDTO;
+import com.gang.wxcommunity.mapper.QuestionExtMapper;
 import com.gang.wxcommunity.mapper.QuestionMapper;
 import com.gang.wxcommunity.mapper.UserMapper;
 import com.gang.wxcommunity.model.Question;
@@ -15,11 +16,18 @@ import java.util.List;
 
 @Service
 public class QuestionService {
+
     @Autowired
     private QuestionMapper questionMapper;
     @Autowired
+    private QuestionExtMapper questionExtMapper;
+    @Autowired
     private UserMapper userMapper;
 
+    /**
+     * 添加提问或更新提问
+     * @param question
+     */
     public void addOrUpdate(Question question) {
         if (question.getId() == null) {
             //创建
@@ -36,9 +44,14 @@ public class QuestionService {
         }
     }
 
+    /**
+     * 得到所有提问
+     * @return 返回问题集合
+     */
     public List<QuestionDTO> findAll() {
-        List<Question> questions = questionMapper.selectByExample(new QuestionExample());
-
+        QuestionExample example = new QuestionExample();
+        example.setOrderByClause("gmt_create desc");
+        List<Question> questions = questionMapper.selectByExample(example);
         List<QuestionDTO> questionDTOS = new ArrayList<>();
         for (Question question : questions) {
             QuestionDTO questionDTO = new QuestionDTO();
@@ -61,5 +74,15 @@ public class QuestionService {
         BeanUtils.copyProperties(question,questionDTO);
         questionDTO.setUser(user);
         return questionDTO;
+    }
+
+    /**
+     * 增加问题阅读数
+     * @param id
+     */
+    public void incView(Long id) {
+        Question question=questionMapper.selectByPrimaryKey(id);
+        question.setViewCount(1);
+        questionExtMapper.incView(question);
     }
 }

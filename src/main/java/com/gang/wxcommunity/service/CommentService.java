@@ -1,14 +1,20 @@
 
 package com.gang.wxcommunity.service;
+import com.gang.wxcommunity.dto.CommentDTO;
 import com.gang.wxcommunity.enums.CommentTypeEnum;
 import com.gang.wxcommunity.exception.CustomizeErrorCode;
 import com.gang.wxcommunity.exception.CustomizeException;
 import com.gang.wxcommunity.mapper.*;
-import com.gang.wxcommunity.model.Comment;
-import com.gang.wxcommunity.model.Question;
-import com.gang.wxcommunity.model.User;
+import com.gang.wxcommunity.model.*;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class CommentService {
@@ -75,37 +81,42 @@ public class CommentService {
 //        notificationMapper.insert(notification);
 //    }
 //
-//    public List<CommentDTO> getCommentListByType(Long id, CommentTypeEnum commentTypeEnum) {
-//        CommentExample commentExample = new CommentExample();
-//        commentExample.createCriteria()
-//                .andParentIdEqualTo(id)
-//                .andTypeEqualTo(commentTypeEnum.getType());
-//        commentExample.setOrderByClause("gmt_create desc");
-//        List<Comment> comments = commentMapper.selectByExample(commentExample);
-//
-//        if (comments.size()==0) {
-//            return new ArrayList<>();
-//        }
-//        //获取去重的评论人
-//        Set<Long> commentators = comments.stream().map(comment -> comment.getCommentator()).collect(Collectors.toSet());
-//        List<Long> userIds = new ArrayList();
-//        userIds.addAll(commentators);
-//
-//        //获取评论人并转换为Map
-//        UserExample userExample = new UserExample();
-//        userExample.createCriteria()
-//                .andIdIn(userIds);
-//        List<User> users = userMapper.selectByExample(userExample);
-//        Map<Long, User> userMap = users.stream().collect(Collectors.toMap(user -> user.getId(), user -> user));
-//
-//        //转换comment为commentDTO
-//        List<CommentDTO> commentDTOS = comments.stream().map(comment -> {
-//            CommentDTO commentDTO = new CommentDTO();
-//            BeanUtils.copyProperties(comment, commentDTO);
-//            commentDTO.setUser(userMap.get(comment.getCommentator()));
-//            return commentDTO;
-//        }).collect(Collectors.toList());
-//
-//        return commentDTOS;
-//    }
+    public List<CommentDTO> getCommentListByType(Long id, CommentTypeEnum commentTypeEnum) {
+        CommentExample commentExample = new CommentExample();
+        commentExample.createCriteria()
+                .andParentIdEqualTo(id)
+                .andTypeEqualTo(commentTypeEnum.getType());
+        commentExample.setOrderByClause("gmt_create desc");
+        List<Comment> comments = commentMapper.selectByExample(commentExample);
+
+        if (comments.size()==0) {
+            return new ArrayList<>();
+        }
+        //获取去重的评论人
+        Set<Long> commentators = comments.stream().map(comment -> comment.getCommentator()).collect(Collectors.toSet());
+        List<Long> userIds = new ArrayList();
+        userIds.addAll(commentators);
+
+        //获取评论人并转换为Map
+        UserExample userExample = new UserExample();
+        userExample.createCriteria()
+                .andIdIn(userIds);
+        List<User> users = userMapper.selectByExample(userExample);
+        Map<Long, User> userMap = users.stream().collect(Collectors.toMap(user -> user.getId(), user -> user));
+
+        //转换comment为commentDTO
+        List<CommentDTO> commentDTOS = comments.stream().map(comment -> {
+            CommentDTO commentDTO = new CommentDTO();
+            BeanUtils.copyProperties(comment, commentDTO);
+            commentDTO.setUser(userMap.get(comment.getCommentator()));
+            return commentDTO;
+        }).collect(Collectors.toList());
+
+        //遍历设置显示子评论为false
+        for (CommentDTO commentDTO: commentDTOS) {
+            commentDTO.setIsShowSon(false);
+        }
+
+        return commentDTOS;
+    }
 }

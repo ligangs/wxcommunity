@@ -56,7 +56,7 @@ public class AuthorizeController {
             JSONObject jsonObject = JSONObject.parseObject(result);
             // 获取到key为shoppingCartItemList的值
             openId = jsonObject.getString("openid");
-            System.out.println(openId);
+//            System.out.println(openId);
         } catch (IOException e){
         }
         //创建User对象

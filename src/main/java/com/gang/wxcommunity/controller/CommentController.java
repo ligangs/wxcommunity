@@ -1,6 +1,9 @@
 package com.gang.wxcommunity.controller;
 
 import com.gang.wxcommunity.dto.CommentCreateDTO;
+import com.gang.wxcommunity.dto.CommentDTO;
+import com.gang.wxcommunity.dto.CommentReq;
+import com.gang.wxcommunity.enums.CommentTypeEnum;
 import com.gang.wxcommunity.enums.ResponseCodeEnum;
 import com.gang.wxcommunity.model.Comment;
 import com.gang.wxcommunity.model.User;
@@ -13,6 +16,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 @Controller
 public class CommentController {
@@ -48,10 +52,15 @@ public class CommentController {
         return ResponseVo.getSuccResponse("回答成功！");
     }
 
-//    @ResponseBody
-//    @RequestMapping(value = "/comment/{id}",method = RequestMethod.POST,produces = "application/json; charset=utf-8")
-//    public ResultDTO comments(@PathVariable(name="id")Long id) {
-//        List<CommentDTO> commentDTOS = commentService.getCommentListByType(id, CommentTypeEnum.COMMENT);
-//        return ResultDTO.okOf(commentDTOS);
-//    }
+    @ResponseBody
+        @RequestMapping(value = "/comment/{id}",method = RequestMethod.POST,produces = "application/json; charset=utf-8")
+    public Object comments(@PathVariable(name="id")Long id, @RequestBody CommentReq commentReq) {
+        List<CommentDTO> commentDTOS=null;
+        if (commentReq.getType()==CommentTypeEnum.QUESTION.getType()) {
+            commentDTOS = commentService.getCommentListByType(id, CommentTypeEnum.QUESTION);
+        }else{
+            commentDTOS = commentService.getCommentListByType(id, CommentTypeEnum.COMMENT);
+        }
+        return ResponseVo.getSuccResponse(commentDTOS);
+    }
 }

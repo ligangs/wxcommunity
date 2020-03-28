@@ -17,6 +17,7 @@ public class QuestionController {
     @ResponseBody
     @GetMapping("/question/{id}")
     public ResponseVo question(@PathVariable("id")Long id) {
+        questionService.incView(id);
         QuestionDTO questionDTO=questionService.findQuestionById(id);
         return ResponseVo.getSuccResponse(questionDTO);
     }
