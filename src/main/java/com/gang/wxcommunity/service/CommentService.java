@@ -2,6 +2,8 @@
 package com.gang.wxcommunity.service;
 import com.gang.wxcommunity.dto.CommentDTO;
 import com.gang.wxcommunity.enums.CommentTypeEnum;
+import com.gang.wxcommunity.enums.NotificationStatusEnum;
+import com.gang.wxcommunity.enums.NotificationTypeEnum;
 import com.gang.wxcommunity.exception.CustomizeErrorCode;
 import com.gang.wxcommunity.exception.CustomizeException;
 import com.gang.wxcommunity.mapper.*;
@@ -29,6 +31,8 @@ public class CommentService {
     private QuestionExtMapper questionExtMapper;
     @Autowired
     private UserMapper userMapper;
+    @Autowired
+    private NotificationMapper notificationMapper;
 
     public void insert(Comment comment, User commentator) {
         if (comment.getParentId() == null || comment.getParentId() == 0) {
@@ -52,7 +56,7 @@ public class CommentService {
             commentMapper.insert(comment);
             commentExtMapper.incComment(dbComment);
             //创建通知
-            //createNotify(comment,dbComment.getCommentator(),commentator.getName(),dbQuestion.getTitle(), NotificationTypeEnum.REPLY_COMMENT,dbQuestion.getId());
+            createNotify(comment,dbComment.getCommentator(),commentator.getNickName(),dbQuestion.getTitle(), NotificationTypeEnum.REPLY_COMMENT,dbQuestion.getId());
         } else {
             //回复问题
             Question dbQuestion = questionMapper.selectByPrimaryKey(comment.getParentId());
@@ -63,24 +67,24 @@ public class CommentService {
             dbQuestion.setCommentCount(1);
             questionExtMapper.incComment(dbQuestion);
             //创建通知
-            //createNotify(comment,dbQuestion.getCreator(),commentator.getName(),dbQuestion.getTitle(),NotificationTypeEnum.REPLY_QUESTION,dbQuestion.getId());
+            createNotify(comment,dbQuestion.getCreator(),commentator.getNickName(),dbQuestion.getTitle(),NotificationTypeEnum.REPLY_QUESTION,dbQuestion.getId());
         }
     }
 
-//    //创建一个通知
-//    private void createNotify(Comment comment, Long receiver, String notifierName, String outerTitle, NotificationTypeEnum notificationType,Long outerId) {
-//        Notification notification = new Notification();
-//        notification.setGmtCreate(System.currentTimeMillis());
-//        notification.setOuterid(outerId);
-//        notification.setNotifier(comment.getCommentator());
-//        notification.setType(notificationType.getType());
-//        notification.setStatus(NotificationStatusEnum.UNREAD.getStatus());
-//        notification.setReceiver(receiver);
-//        notification.setNotifierName(notifierName);
-//        notification.setOuterTitle(outerTitle);
-//        notificationMapper.insert(notification);
-//    }
-//
+    //创建一个通知
+    private void createNotify(Comment comment, Long receiver, String notifierName, String outerTitle, NotificationTypeEnum notificationType, Long outerId) {
+        Notification notification = new Notification();
+        notification.setGmtCreate(System.currentTimeMillis());
+        notification.setOuterId(outerId);
+        notification.setNotifier(comment.getCommentator());
+        notification.setType(notificationType.getType());
+        notification.setStatus(NotificationStatusEnum.UNREAD.getStatus());
+        notification.setReceiver(receiver);
+        notification.setNotifierName(notifierName);
+        notification.setOuterTitle(outerTitle);
+        notificationMapper.insert(notification);
+    }
+
     public List<CommentDTO> getCommentListByType(Long id, CommentTypeEnum commentTypeEnum) {
         CommentExample commentExample = new CommentExample();
         commentExample.createCriteria()

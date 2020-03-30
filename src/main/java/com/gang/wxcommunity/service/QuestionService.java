@@ -63,6 +63,25 @@ public class QuestionService {
     }
 
     /**
+     * 根据UserId得到所有提问
+     * @return 返回问题集合
+     */
+    public List<QuestionDTO> getQuestionByUserId(Long id) {
+        QuestionExample example = new QuestionExample();
+        example.setOrderByClause("gmt_create desc");
+        example.createCriteria().andCreatorEqualTo(id);
+        List<Question> questions = questionMapper.selectByExample(example);
+        List<QuestionDTO> questionDTOS = new ArrayList<>();
+        for (Question question : questions) {
+            QuestionDTO questionDTO = new QuestionDTO();
+            BeanUtils.copyProperties(question,questionDTO);
+            questionDTO.setUser( userMapper.selectByPrimaryKey(question.getCreator()));
+            questionDTOS.add(questionDTO);
+        }
+        return questionDTOS;
+    }
+
+    /**
      * 通过问题ID查询一个问题
      * @param id
      * @return QuestionDTO
@@ -84,5 +103,11 @@ public class QuestionService {
         Question question=questionMapper.selectByPrimaryKey(id);
         question.setViewCount(1);
         questionExtMapper.incView(question);
+    }
+
+    public Integer getMyQuestionCount(Long id) {
+        QuestionExample example = new QuestionExample();
+        example.createCriteria().andCreatorEqualTo(id);
+        return (int)questionMapper.countByExample(example);
     }
 }
