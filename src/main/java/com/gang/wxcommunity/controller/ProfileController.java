@@ -29,7 +29,7 @@ public class ProfileController {
         //根据token判断是否登录
         User user = userService.findUserByToken(tokenReq.getToken());
         if(user==null){
-            return ResponseVo.getErrResponse(ResponseCodeEnum.NOT_LOGIN.getCode(), ResponseCodeEnum.NOT_LOGIN.getDesc());
+            return ResponseVo.getErrResponse(ResponseCodeEnum.INVALID_TOKEN.getCode(), ResponseCodeEnum.INVALID_TOKEN.getDesc());
         }
         ProfileDTO profileDTO = new ProfileDTO();
         profileDTO.setMyQuestionCount(questionService.getMyQuestionCount(user.getId()));
@@ -44,7 +44,7 @@ public class ProfileController {
         //根据token判断是否登录
         User user = userService.findUserByToken(tokenReq.getToken());
         if(user==null){
-            return ResponseVo.getErrResponse(ResponseCodeEnum.NOT_LOGIN.getCode(), ResponseCodeEnum.NOT_LOGIN.getDesc());
+            return ResponseVo.getErrResponse(ResponseCodeEnum.INVALID_TOKEN.getCode(), ResponseCodeEnum.INVALID_TOKEN.getDesc());
         }
         if ("questions".equals(action)) {
             //得到对应用户的问题

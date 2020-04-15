@@ -27,7 +27,7 @@ public class PublishController {
         //根据token判断是否登录
         User user = userService.findUserByToken(publishReq.getToken());
         if(user==null){
-            return ResponseVo.getErrResponse(ResponseCodeEnum.NOT_LOGIN.getCode(), ResponseCodeEnum.NOT_LOGIN.getDesc());
+            return ResponseVo.getErrResponse(ResponseCodeEnum.INVALID_TOKEN.getCode(), ResponseCodeEnum.INVALID_TOKEN.getDesc());
         }
 
         Question question = new Question();

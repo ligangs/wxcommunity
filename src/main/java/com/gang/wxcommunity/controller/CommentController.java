@@ -33,7 +33,7 @@ public class CommentController {
         //根据token判断是否登录
         User user = userService.findUserByToken(commentCreateDTO.getToken());
         if(user==null){
-            return ResponseVo.getErrResponse(ResponseCodeEnum.NOT_LOGIN.getCode(), ResponseCodeEnum.NOT_LOGIN.getDesc());
+            return ResponseVo.getErrResponse(ResponseCodeEnum.INVALID_TOKEN.getCode(), ResponseCodeEnum.INVALID_TOKEN.getDesc());
         }
 
         if (commentCreateDTO == null || StringUtils.isBlank(commentCreateDTO.getComment())) {
