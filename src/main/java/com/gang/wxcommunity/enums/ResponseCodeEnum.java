@@ -10,6 +10,7 @@ public enum ResponseCodeEnum{
     NOT_LOGIN("0001", "用户未登录"),
     NO_COMMENT("0002", "没有评论内容"),
     INVALID_TOKEN("0003","无效token"),
+    NO_QUESTION("0004","提问不存在"),
 
     ERROR_400("9999", "error.400"),
     ERROR_401("9999", "error.401"),

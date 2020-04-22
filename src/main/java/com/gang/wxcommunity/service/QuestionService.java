@@ -89,6 +89,8 @@ public class QuestionService {
     public QuestionDTO findQuestionById(Long id) {
         QuestionDTO questionDTO = new QuestionDTO();
         Question question = questionMapper.selectByPrimaryKey(id);
+        if(question==null)
+            return questionDTO;
         User user = userMapper.selectByPrimaryKey(question.getCreator());
         BeanUtils.copyProperties(question,questionDTO);
         questionDTO.setUser(user);
@@ -105,9 +107,22 @@ public class QuestionService {
         questionExtMapper.incView(question);
     }
 
+    /**
+     * 根据用户id 查询用户提问数
+     * @param id
+     * @return 用户提问个数
+     */
     public Integer getMyQuestionCount(Long id) {
         QuestionExample example = new QuestionExample();
         example.createCriteria().andCreatorEqualTo(id);
         return (int)questionMapper.countByExample(example);
+    }
+
+    /**
+     * 删除问题
+     * @param id
+     */
+    public int deletQuestion(Long id) {
+        return questionMapper.deleteByPrimaryKey(id);
     }
 }

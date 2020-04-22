@@ -21,8 +21,11 @@ public class QuestionController {
     @ResponseBody
     @GetMapping("/question/{id}")
     public ResponseVo question(@PathVariable("id")Long id) {
-        questionService.incView(id);
         QuestionDTO questionDTO=questionService.findQuestionById(id);
+        if (questionDTO == null || questionDTO.getId()==null) {
+            return ResponseVo.getErrResponse(ResponseCodeEnum.NO_QUESTION.getCode(), ResponseCodeEnum.NO_QUESTION.getDesc());
+        }
+        questionService.incView(id);
         return ResponseVo.getSuccResponse(questionDTO);
     }
 
@@ -35,5 +38,14 @@ public class QuestionController {
             return ResponseVo.getErrResponse(ResponseCodeEnum.INVALID_TOKEN.getCode(), ResponseCodeEnum.INVALID_TOKEN.getDesc());
         }
         return ResponseVo.getSuccResponse(questionService.getQuestionByUserId(user.getId()));
+    }
+
+    @ResponseBody
+    @GetMapping("/deletQuestion/{id}")
+    public ResponseVo deletQuestion(@PathVariable("id")Long id){
+        if(questionService.deletQuestion(id)>0){
+            return ResponseVo.getSuccResponse("删除成功！");
+        }
+        return ResponseVo.getErrResponse("删除失败！");
     }
 }
