@@ -63,6 +63,25 @@ public class QuestionService {
     }
 
     /**
+     * 得到所有提问
+     * @return 返回问题集合
+     */
+    public List<QuestionDTO> findAll(String search) {
+        QuestionExample example = new QuestionExample();
+        example.setOrderByClause("gmt_create desc");
+        example.createCriteria().andTitleLike("%" + search + "%");
+        List<Question> questions = questionMapper.selectByExample(example);
+        List<QuestionDTO> questionDTOS = new ArrayList<>();
+        for (Question question : questions) {
+            QuestionDTO questionDTO = new QuestionDTO();
+            BeanUtils.copyProperties(question,questionDTO);
+            questionDTO.setUser( userMapper.selectByPrimaryKey(question.getCreator()));
+            questionDTOS.add(questionDTO);
+        }
+        return questionDTOS;
+    }
+
+    /**
      * 根据UserId得到所有提问
      * @return 返回问题集合
      */
